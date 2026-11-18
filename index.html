@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nhân khẩu CSKV</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b5cab">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f5f7;--card:#fff;--tx:#1b1f24;--mu:#6b7280;--ac:#0b5cab;--ln:#e3e6ea;--wa:#b45309;--ok:#15803d;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101418;--card:#1a2027;--tx:#e8ebef;--mu:#98a2b0;--ac:#6cb0f5;--ln:#2a323b;--wa:#f0b35a;--ok:#5fd08a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101418;--card:#1a2027;--tx:#e8ebef;--mu:#98a2b0;--ac:#6cb0f5;--ln:#2a323b;--wa:#f0b35a;--ok:#5fd08a;color-scheme:dark}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+button,input,select,textarea{font:inherit;color:inherit}
+.top{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:10px 12px 6px;z-index:5;border-bottom:1px solid var(--ln)}
+.row{display:flex;gap:8px;align-items:center}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--ln);border-radius:10px;background:var(--card)}
+textarea{min-height:70px;resize:vertical}
+button{border:0;border-radius:10px;padding:10px 14px;background:var(--ac);color:#fff;font-weight:600}
+button.g{background:var(--card);color:var(--tx);border:1px solid var(--ln)}
+button.d{background:#b91c1c}
+.flt{display:flex;gap:6px;margin-top:8px;overflow-x:auto}
+.flt select{width:auto;min-width:120px;padding:8px}
+.cnt{color:var(--mu);font-size:13px;padding:8px 14px}
+.it{background:var(--card);margin:0 12px 8px;padding:10px 12px;border-radius:12px;border:1px solid var(--ln)}
+.it b{display:block}.it small{color:var(--mu)}
+.tag{display:inline-block;font-size:12px;padding:1px 7px;border-radius:9px;background:var(--bg);border:1px solid var(--ln);margin-right:4px}
+.tag.w{color:var(--wa);border-color:var(--wa)}.tag.o{color:var(--ok);border-color:var(--ok)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:20}
+.ov.on{display:block}
+.sh{position:absolute;left:0;right:0;bottom:0;top:6%;background:var(--bg);border-radius:16px 16px 0 0;overflow:auto;padding:14px 14px calc(24px + env(safe-area-inset-bottom,0px))}
+.sh h2{margin:0 0 4px;font-size:20px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:4px 8px;margin:10px 0;font-size:15px}.kv span:nth-child(odd){color:var(--mu)}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
+.mem{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--ln)}
+.lock{position:fixed;inset:0;background:var(--bg);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center}
+.lock input{max-width:240px;text-align:center;font-size:22px;letter-spacing:6px}
+.msg{color:var(--wa);min-height:1.2em;font-size:14px}
+a.call{color:var(--ac);text-decoration:none;font-weight:600}
+.br{margin:8px 0;cursor:pointer}.br div{display:flex;justify-content:space-between;font-size:14px}.br i{display:block;height:8px;border-radius:5px;background:var(--ac);margin-top:3px}.br i.w{background:var(--wa)}.br i.m{background:var(--mu)}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}.cd{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:10px}.cd b{font-size:26px;display:block}.cd small{color:var(--mu)}h3.s{margin:20px 0 2px;font-size:16px}
+</style>
+</head>
+<body>
+<div class="lock" id="lock"><h2 id="lt">Nhân khẩu CSKV</h2><div id="ls" style="color:var(--mu)"></div><input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="••••"><button id="lb">Mở khóa</button><div class="msg" id="lm"></div></div>
+
+<div class="top">
+  <div class="row"><input id="q" type="search" placeholder="Tìm tên, mã hộ, SĐT, địa chỉ… (không cần dấu)"><button class="g" id="fb" aria-label="Lọc"></button><button class="g" id="dash">📊</button><button class="g" id="menu">☰</button></div>
+  <div class="row" style="margin-top:8px"><button class="g seg" id="m1">Theo nhân khẩu</button><button class="g seg" id="m2">Theo hộ</button></div>
+  <div class="flt" style="display:none"><select id="fa"><option value="">Mọi địa chỉ</option></select><select id="fc"><option value="">Mọi cư trú</option></select><select id="fr"><option value="">Mọi vai trò</option><option>Chủ hộ</option><option>Thành viên</option></select><select id="fv"><option value="">Mọi diện</option><option value="vp">Có vi phạm</option><option value="vl">Chưa có việc làm</option></select></div>
+</div>
+<button id="sy" style="margin:8px 12px 0;width:calc(100% - 24px)">SAO LƯU VÀ ĐỒNG BỘ</button>
+<div class="cnt" id="cnt"></div>
+<div id="list"></div>
+
+<div class="ov" id="ov"><div class="sh" id="sh"></div></div>
+
+<script>
+if(typeof claude==="undefined"){window.claude={use:async()=>({save:async({filename,data})=>{const b=new Blob([data],{type:filename.endsWith(".json")?"application/json":"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}})}}
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const CU=["Thường trú tại chỗ","Tạm vắng","Tạm trú","Đã chuyển đi","Đã chết","Chưa xác minh"];
+const HOC=["Đang đi học","Nghỉ học","Đã học xong"];
+const LV=["Sinh sống & làm việc tại địa phương","Đi địa bàn khác làm việc","Bỏ địa phương, không rõ đi đâu làm gì","Không đi làm (nội trợ, già yếu…)"];
+let F=null,FN=[];
+const gt=p=>p.gt||"";
+const sel=(id,arr,v)=>`<select id="${id}"><option value="">—</option>${arr.map(x=>`<option ${x===v?"selected":""}>${esc(x)}</option>`).join("")}</select>`;
+const $=id=>document.getElementById(id);
+let P=[],DB=null;
+const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d").replace(/Đ/g,"D").toLowerCase().trim();
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const idb=()=>new Promise((ok,no)=>{try{const r=indexedDB.open("nk",1);r.onupgradeneeded=()=>{r.result.createObjectStore("p",{keyPath:"id",autoIncrement:true});r.result.createObjectStore("m")};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}catch(e){no(e)}});
+const tx=(s,m,f)=>new Promise((ok,no)=>{const t=DB.transaction(s,m);const r=f(t.objectStore(s));t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>no(t.error)});
+const mget=k=>tx("m","readonly",s=>s.get(k));
+const mset=(k,v)=>tx("m","readwrite",s=>s.put(v,k));
+const sha=async s=>[...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode("nk|"+s)))].map(b=>b.toString(16).padStart(2,"0")).join("");
+
+// ---- khóa PIN ----
+let hasPin=false;
+async function initLock(){
+  try{DB=await idb()}catch(e){$("lm").textContent="Trình duyệt không cho lưu dữ liệu: "+e.message;return}
+  hasPin=!!(await mget("pin"));
+  $("ls").textContent=hasPin?"Nhập mã PIN":"Lần đầu: đặt mã PIN (4–12 số)";
+  $("lb").textContent=hasPin?"Mở khóa":"Đặt PIN";
+}
+$("lb").onclick=async()=>{
+  const v=$("pin").value;
+  if(v.length<4){$("lm").textContent="PIN tối thiểu 4 ký tự";return}
+  if(!hasPin){await mset("pin",await sha(v));hasPin=true}
+  else if((await sha(v))!==(await mget("pin"))){$("lm").textContent="Sai PIN";$("pin").value="";return}
+  $("pin").value="";$("lm").textContent="";$("lock").style.display="none";await load();
+};
+$("pin").onkeydown=e=>{if(e.key==="Enter")$("lb").click()};
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&hasPin){$("lock").style.display="flex";$("ls").textContent="Nhập mã PIN";$("lb").textContent="Mở khóa";$("ov").classList.remove("on")}});
+
+// ---- dữ liệu ----
+const idx=p=>{p._s=norm([p.ten,p.chu,p.ma,p.sdt,p.dc,p.vieclam,p.vipham,p.ghichu].join(" "));return p};
+async function load(){P=(await tx("p","readonly",s=>s.getAll())||[]).map(idx);fillSel();render()}
+function fillSel(){
+  const keep=(id,arr,all)=>{const s=$(id),v=s.value;s.innerHTML=`<option value="">${all}</option>`+arr.map(x=>`<option>${esc(x)}</option>`).join("");s.value=v};
+  keep("fa",[...new Set(P.map(p=>p.dc))].sort((a,b)=>a.localeCompare(b,"vi",{numeric:true})),"Mọi địa chỉ");
+  keep("fc",CU,"Mọi cư trú");
+}
+const age=ns=>{const m=String(ns||"").match(/(\d{4})$/);return m?new Date().getFullYear()-+m[1]:null};
+function render(){
+  const q=norm($("q").value).split(/\s+/).filter(Boolean),a=$("fa").value,c=$("fc").value,r=$("fr").value,v=$("fv").value;
+  const R=P.filter(p=>q.every(t=>p._s.includes(t))&&(!F||F.f(p))&&(!a||p.dc===a)&&(!c||(p.cutru||"")===c)&&(!r||p.vaitro===r)&&(!v||(v==="vp"?!!(p.vipham||"").trim():!(p.vieclam||"").trim())));
+  $("cnt").textContent=(F?"Lọc: "+F.n+" ✕ chạm để bỏ lọc · ":"")+(P.length?`${R.length} / ${P.length} nhân khẩu`+(R.length>80?" (hiện 80 đầu, hãy lọc thêm)":""):"Chưa có dữ liệu. Bấm ☰ → Nhập file Excel.");
+  $("list").innerHTML=R.slice(0,80).map(p=>`<div class="it" data-id="${p.id}"><b>${esc(p.ten)} ${p.vaitro==="Chủ hộ"?'<span class="tag o">Chủ hộ</span>':""}</b><small>${esc(p.ns||"?")}${age(p.ns)!=null?" · "+age(p.ns)+" tuổi":""} · ${esc(p.dc)} · ${esc(p.ma)}</small><div style="margin-top:4px">${p.cutru?`<span class="tag ${p.cutru==="Thường trú tại chỗ"?"o":"w"}">${esc(p.cutru)}</span>`:""}${(p.vipham||"").trim()?'<span class="tag w">Có vi phạm</span>':""}${p.vieclam?`<span class="tag">${esc(p.vieclam)}</span>`:""}</div></div>`).join("");
+}
+let t0;["q","fa","fc","fr","fv"].forEach(i=>$(i).oninput=()=>{clearTimeout(t0);t0=setTimeout(render,120)});
+$("list").onclick=e=>{const d=e.target.closest(".it");if(d)detail(+d.dataset.id)};
+
+// ---- chi tiết ----
+const sheet=h=>{$("sh").innerHTML=h;$("ov").classList.add("on");$("sh").scrollTop=0};
+const close=()=>$("ov").classList.remove("on");
+$("ov").onclick=e=>{if(e.target===$("ov"))close()};
+function detail(id){
+  const p=P.find(x=>x.id===id);if(!p)return;
+  const hh=P.filter(x=>x.ma===p.ma&&x.chu===p.chu&&x.dc===p.dc).sort((a,b)=>a.stt-b.stt);
+  sheet(`<div class="row" style="justify-content:space-between"><h2>${esc(p.ten)}</h2><button class="g" onclick="close()">Đóng</button></div>
+  <div class="kv"><span>Ngày sinh</span><span>${esc(p.ns||"?")}${age(p.ns)!=null?" ("+age(p.ns)+" tuổi)":""}</span><span>Vai trò</span><span>${esc(p.vaitro)} (STT ${esc(p.stt)})</span><span>Chủ hộ</span><span>${esc(p.chu)}</span><span>Mã hộ</span><span>${esc(p.ma)}</span><span>Địa chỉ HKTT</span><span>${esc(p.dc)}</span><span>Điện thoại</span><span>${p.sdt?`<a class="call" href="tel:${esc(p.sdt)}">${esc(p.sdt)}</a>`:"—"}</span></div>
+  <label>Tình trạng cư trú</label><select id="e_cu"><option value="">—</option>${CU.map(x=>`<option ${x===p.cutru?"selected":""}>${x}</option>`).join("")}</select>
+  <label>Giới tính${p.gt?"":" (đang tự đoán theo tên, chưa xác nhận)"}</label>${sel("e_gt",["Nam","Nữ"],gt(p))}<label>Học tập (trẻ em)</label>${sel("e_hc",HOC,p.hoc)}<label>Nơi làm việc</label>${sel("e_lv",LV,p.lv)}<label>Nghề nghiệp / nơi làm cụ thể</label><input id="e_vl" value="${esc(p.vieclam)}">
+  <label>Thông tin vi phạm pháp luật</label><textarea id="e_vp">${esc(p.vipham)}</textarea>
+  <label>Ghi chú</label><textarea id="e_gc">${esc(p.ghichu)}</textarea>
+  <div class="row" style="margin-top:12px"><button id="sv">Lưu</button><span class="msg" id="sm"></span></div>
+  <h3 style="margin:20px 0 4px">Cả hộ (${hh.length} người)</h3>${hh.map(x=>`<div class="mem" onclick="detail(${x.id})"><span>${esc(x.ten)}${x.id===id?" ◀":""}</span><small>${esc(x.vaitro)} · ${esc(x.ns||"?")}</small></div>`).join("")}`);
+  $("sv").onclick=async()=>{Object.assign(p,{cutru:$("e_cu").value,gt:$("e_gt").value,hoc:$("e_hc").value,lv:$("e_lv").value,vieclam:$("e_vl").value.trim(),vipham:$("e_vp").value.trim(),ghichu:$("e_gc").value.trim(),upd:new Date().toISOString()});idx(p);
+    const rec={...p};delete rec._s;try{await tx("p","readwrite",s=>s.put(rec));$("sm").textContent="Đã lưu";render()}catch(e){$("sm").textContent="Lỗi lưu: "+e.message}};
+}
+
+// ---- menu: nhập / sao lưu ----
+$("menu").onclick=()=>sheet(`<div class="row" style="justify-content:space-between"><h2>Dữ liệu</h2><button class="g" onclick="close()">Đóng</button></div>
+ <p style="color:var(--mu);font-size:14px">Nhập file Excel (.xlsx/.csv) cột: Mã hộ, Tên chủ hộ, STT, Tên thành viên, Vai trò, Ngày sinh, SĐT, Địa chỉ. Nhập lại file mới sẽ <b>gộp</b>: thêm người mới, cập nhật thông tin gốc, <b>giữ nguyên</b> cư trú, việc làm, vi phạm, ghi chú bạn đã nhập.</p>
+ <button onclick="$('fx').click()">📥 Nhập / cập nhật từ Excel</button><input id="fx" type="file" accept=".xlsx,.xls,.csv" hidden>
+ <p><button class="g" id="bk">💾 Sao lưu ra file</button> <button class="g" onclick="$('fr2').click()">♻️ Khôi phục từ sao lưu</button><input id="fr2" type="file" accept=".json" hidden></p>
+ <p><button class="g" onclick="doPin()">🔑 Đổi PIN</button> <button class="d" onclick="wipe()">🗑 Xóa toàn bộ dữ liệu</button></p>
+ <div class="msg" id="mm"></div>`);
+const mm=t=>{const e=$("mm");if(e)e.textContent=t};
+const H={ma:["ma ho","so hsct"],chu:["ten chu ho"],stt:["stt"],ten:["ten thanh vien","ho ten","ho va ten"],vaitro:["vai tro"],ns:["ngay sinh"],gt:["gioi tinh"],sdt:["so dien thoai","dien thoai","sdt"],dc:["dia chi"]};
+document.addEventListener("change",async e=>{
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  if(e.target.id==="fx")await importX(f);
+  if(e.target.id==="fr2")await restore(f);
+  e.target.value="";
+});
+async function importX(f){
+  try{
+    if(typeof XLSX==="undefined")return mm("Chưa tải được thư viện đọc Excel (cần mạng lần đầu).");
+    mm("Đang đọc…");
+    const wb=XLSX.read(await f.arrayBuffer(),{type:"array"}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:false,defval:""});
+    const hd=rows[0].map(norm),col={};
+    for(const k in H)col[k]=hd.findIndex(h=>H[k].some(x=>h.includes(x)));
+    if(col.ten<0||col.ma<0)return mm("Không nhận ra cột Mã hộ / Tên thành viên ở dòng đầu.");
+    const g=(r,k)=>col[k]<0?"":String(r[col[k]]??"").trim();
+    const key=p=>norm(p.ma)+"|"+norm(p.ten)+"|"+norm(p.ns);
+    const have=new Map(P.map(p=>[key(p),p])),seen=new Set();let add=0,upd=0,dup=0;
+    const batch=[];
+    for(const r of rows.slice(1)){
+      const n={ma:g(r,"ma"),chu:g(r,"chu"),stt:g(r,"stt"),ten:g(r,"ten"),vaitro:g(r,"vaitro")||"Thành viên",ns:g(r,"ns"),sdt:g(r,"sdt"),dc:g(r,"dc"),gt:gn(g(r,"gt"))};
+      if(!n.ten)continue;const k=key(n);
+      if(seen.has(k)){dup++;continue}seen.add(k);
+      const o=have.get(k);
+      if(o){Object.assign(o,n,{sdt:o.sdtSua?o.sdt:(n.sdt||o.sdt),gt:n.gt||o.gt});upd++;batch.push(o)}
+      else{batch.push(n);add++}
+    }
+    const miss=P.filter(p=>!seen.has(key(p))).length;
+    await tx("p","readwrite",s=>{batch.forEach(b=>{const c={...b};delete c._s;s.put(c)})});
+    await load();
+    mm(`Xong: thêm ${add}, cập nhật ${upd}, bỏ ${dup} dòng trùng. ${miss} người trong máy không có trong file mới (đã giữ nguyên, hãy tự kiểm tra: có thể đã chuyển đi).`);
+  }catch(e){mm("Lỗi nhập: "+e.message)}
+}
+async function save(name,data){
+  try{const d=await claude.use("downloads");if(!d)return mm("Môi trường này không hỗ trợ lưu file.");await d.save({filename:name,data});mm("Đã gửi yêu cầu lưu file.")}
+  catch(e){mm(e&&e.code==="declined"?"Bạn đã hủy.":"Không lưu được: "+(e.message||e))}
+}
+document.addEventListener("click",e=>{if(e.target.id==="bk"){const d=P.map(p=>{const c={...p};delete c._s;return c});save("nhan-khau-sao-luu-"+new Date().toISOString().slice(0,10)+".json",JSON.stringify(d))}});
+async function restore(f){
+  try{const d=JSON.parse(await f.text());if(!Array.isArray(d))throw Error("File không đúng định dạng");
+    if(!confirm("Thay toàn bộ dữ liệu hiện tại bằng bản sao lưu ("+d.length+" người)?"))return;
+    await tx("p","readwrite",s=>{s.clear();d.forEach(x=>{delete x.id;s.put(x)})});await load();mm("Đã khôi phục "+d.length+" người.")}
+  catch(e){mm("Lỗi khôi phục: "+e.message)}
+}
+async function doPin(){const v=prompt("PIN mới (4–12 ký tự):");if(v&&v.length>=4&&v.length<=12){await mset("pin",await sha(v));mm("Đã đổi PIN.")}else if(v)mm("PIN không hợp lệ.")}
+async function wipe(){if(confirm("Xóa TOÀN BỘ dữ liệu nhân khẩu trong máy? Không thể hoàn tác.")&&confirm("Chắc chắn xóa?")){await tx("p","readwrite",s=>s.clear());await load();mm("Đã xóa.")}}
+$("dash").onclick=dashboard;
+$("cnt").onclick=()=>{if(F){F=null;render()}};
+document.addEventListener("click",e=>{const r=e.target.closest(".br");if(r){F=FN[+r.dataset.i];close();render();window.scrollTo(0,0)}});
+function dashboard(){
+ const n=P.length,hh=new Set(P.map(p=>p.ma+"|"+p.chu+"|"+p.dc)).size;FN=[];
+ const R=(lab,fn,base,cl)=>{const c=P.filter(fn).length,i=FN.push({n:lab,f:fn})-1;return `<div class="br" data-i="${i}"><div><span>${esc(lab)}</span><b>${c}${base?" · "+Math.round(c*100/base)+"%":""}</b></div><i class="${cl||""}" style="width:${base?Math.max(c*100/base,c?2:0):0}%"></i></div>`};
+ const ag=(a,b)=>p=>{const x=age(p.ns);return x!=null&&x>=a&&x<=b};
+ const kid=ag(6,17),adult=ag(15,59),nk=P.filter(kid).length,na=P.filter(adult).length,guess=P.filter(p=>!p.gt&&gt(p)).length;
+ const S=(t,h)=>`<h3 class="s">${t}</h3>${h}`;
+ let h=`<div class="row" style="justify-content:space-between"><h2>Tổng quan</h2><button class="g" onclick="close()">Đóng</button></div><div class="cards"><div class="cd"><b>${hh}</b><small>Số hộ</small></div><div class="cd"><b>${n}</b><small>Số khẩu</small></div><div class="cd"><b>${P.filter(p=>p.vaitro==="Chủ hộ").length}</b><small>Chủ hộ</small></div><div class="cd"><b>${hh?(n/hh).toFixed(1):0}</b><small>Khẩu / hộ</small></div></div>`;
+ h+=S(`Giới tính <small style="color:var(--mu)">(${guess} người đang tự đoán theo tên đệm Văn/Thị)</small>`,R("Nam",p=>gt(p)==="Nam",n)+R("Nữ",p=>gt(p)==="Nữ",n,"w")+R("Chưa xác định",p=>!gt(p),n,"m"));
+ h+=S("Độ tuổi",[["0–5 tuổi",0,5],["6–14 tuổi",6,14],["15–17 tuổi",15,17],["18–35 tuổi",18,35],["36–59 tuổi",36,59],["Từ 60 tuổi",60,200]].map(([l,a,b])=>R(l,ag(a,b),n)).join("")+R("Chưa rõ năm sinh",p=>age(p.ns)==null,n,"m"));
+ h+=S(`Trẻ 6–17 tuổi (${nk} em)`,R("Đang đi học",p=>kid(p)&&p.hoc==="Đang đi học",nk)+R("Nghỉ học",p=>kid(p)&&p.hoc==="Nghỉ học",nk,"w")+R("Đã học xong",p=>kid(p)&&p.hoc==="Đã học xong",nk)+R("Chưa cập nhật",p=>kid(p)&&!p.hoc,nk,"m"));
+ h+=S(`Độ tuổi lao động 15–59 (${na} người)`,LV.map((l,i)=>R(l,p=>adult(p)&&p.lv===l,na,i===2?"w":"")).join("")+R("Chưa cập nhật",p=>adult(p)&&!p.lv,na,"m"));
+ h+=S("Tình trạng cư trú",CU.map(c=>R(c,p=>p.cutru===c,n)).join("")+R("Chưa cập nhật",p=>!p.cutru,n,"m"));
+ h+=S("Pháp luật",R("Có thông tin vi phạm",p=>!!(p.vipham||"").trim(),n,"w"));
+ sheet(h+`<p style="color:var(--mu);font-size:13px">Chạm vào một dòng để xem danh sách người tương ứng.</p>`);
+}
+/* ===== v3: theo yêu cầu CSKV (các hàm khai báo sau ghi đè bản cũ) ===== */
+const CU4=["Sinh sống và làm việc tại địa phương","Đến địa phương khác làm việc, thỉnh thoảng có về nhà","Đến địa phương khác làm việc, không về địa phương nhưng có khai báo lưu trú","Không rõ"],CUI=["🟢","🟡","🟠","⚪"];
+const NN=["Công nhân","Nông dân","Công chức","Viên chức","Công an","Quân đội","Giáo viên","Nhân viên y tế","Học sinh","Sinh viên","Kinh doanh, buôn bán","Lao động tự do","Tài xế","Thợ xây dựng","Thợ cơ khí","Thợ điện","Thợ sửa chữa","Nội trợ","Hưu trí","Thất nghiệp","Khác"];
+const QH=["Chủ hộ","Vợ","Chồng","Con","Con nuôi","Cha","Mẹ","Ông","Bà","Cháu","Anh","Chị","Em","Anh rể","Chị dâu","Em rể","Em dâu","Cô","Dì","Chú","Bác","Cậu","Mợ","Khác"];
+const PL=[["thi","Thi hành án hình sự tại cộng đồng"],["ma","Sử dụng ma túy"],["cai","Quản lý sau cai nghiện"],["gd","Giáo dục tại xã"]];
+const DS3=[["kk","Hoàn cảnh khó khăn"],["nd","Neo đơn"],["kg","Không có giấy tờ tùy thân"]];
+const qh=p=>p.qh==="Khác"?(p.qhk||"Khác"):(p.qh||p.vaitro||""),nn=p=>p.nn==="Khác"?(p.nnk||"Khác"):(p.nn||"");
+const today=()=>new Date().toISOString().slice(0,10),hkey=p=>p.ma+"|"+p.chu+"|"+p.dc,show=(i,b)=>{$(i).style.display=b?"block":"none"};
+const addM=(d,m)=>{if(!d||!+m)return"";const x=new Date(d);x.setMonth(x.getMonth()+ +m);return x.toISOString().slice(0,10)};
+const dsL=p=>{const d=p.ds||{},o=[];if(d.kk)o.push("Khó khăn");if(d.nd)o.push("Neo đơn");if(d.kg)o.push("Không giấy tờ");if(d.vp)o.push("Vi phạm");return o};
+const log=(p,n,a,b)=>(p.ls=p.ls||[]).push({t:new Date().toISOString(),n,a,b});
+const fd=s=>s?new Date(s).toLocaleDateString("vi-VN"):"—";
+const idx2=p=>{idx(p);p._s+=" "+norm([qh(p),nn(p),p.dcht,p.cg,JSON.stringify(p.nv||{}),dsL(p).join(" ")].join(" "));return p};
+function snap(p){const d=p.ds||{},nv=p.nv||{},pl=p.pl||{};
+ const v=[...DS3.filter(x=>d[x[0]]).map(x=>x[1]+((p.dsg||{})[x[0]]?" ("+p.dsg[x[0]]+")":""))];
+ if(d.vp){const a=[];if(nv.tt){const t=nv.ttd||{};a.push("Tù tha về ["+[t.bat&&"bắt "+fd(t.bat),t.ban&&"bản án "+t.ban,t.toi&&"tội danh "+t.toi,t.xong&&"xong án "+fd(t.xong),t.thu&&"thử thách "+t.thu].filter(Boolean).join("; ")+"]")}if(nv.ta){const t=nv.tad||{};a.push("Tiền án, tiền sự ["+[t.hv&&"hành vi "+t.hv,t.xl&&"xử lý "+t.xl,t.ngay&&fd(t.ngay)].filter(Boolean).join("; ")+"]")}if(nv.kh)a.push("Khác: "+(nv.khT||""));v.push("Vi phạm – Nghiệp vụ["+a.join(", ")+"]");
+  PL.forEach(([k,l])=>{const x=pl[k];if(x&&x.on)v.push(l+" ("+fd(x.bd)+"→"+fd(x.kt)+(x.hh?", đã hết thời hạn":"")+")")})}
+ return{"Số điện thoại":p.sdt||"","Quan hệ với chủ hộ":qh(p),"Giới tính":gt(p),"Tình trạng cư trú":p.cu?p.cu+(p.dcht?" | Nơi ở: "+p.dcht:"")+(p.cg?" | "+p.cg:""):"","Nghề nghiệp":nn(p),"Học tập":p.hoc||"","Diện đặc biệt":v.join("; ")}}
+function expire(p){let ch=false;const t=today();p.pl=p.pl||{};
+ for(const[k,l]of PL){const x=p.pl[k];if(x&&x.on&&!x.hh&&x.kt&&x.kt<t){x.hh=true;ch=true;p.nv=p.nv||{};p.nv.kh=true;p.nv.khT=(p.nv.khT?p.nv.khT+"; ":"")+`Hết thời hạn “${l}” (${fd(x.bd)} → ${fd(x.kt)})`;log(p,"Diện đặc biệt",l+": đang quản lý",l+": Đã hết thời hạn → chuyển Nghiệp vụ/Khác (theo dõi nội bộ)")}}return ch}
+let LB="",shown=0;
+async function load(){P=(await tx("p","readonly",s=>s.getAll())||[]);LB=(await mget("lb"))||"";const ex=[];
+ P.forEach(p=>{if(expire(p)){p.upd=new Date().toISOString();ex.push(p)}idx2(p)});
+ if(ex.length)await tx("p","readwrite",s=>ex.forEach(p=>{const c={...p};delete c._s;s.put(c)}));
+ fillSel();render();if(!shown&&P.length){shown=1;dashboard()}}
+function fillSel(){const f=(id,arr,all,vals)=>{const s=$(id),v=s.value;s.innerHTML=`<option value="">${all}</option>`+arr.map((x,i)=>`<option value="${vals?vals[i]:esc(x)}">${esc(x)}</option>`).join("");s.value=v};
+ f("fa",[...new Set(P.map(p=>p.dc))].sort((a,b)=>a.localeCompare(b,"vi",{numeric:true})),"Mọi địa chỉ");
+ f("fc",CU4,"Mọi cư trú");f("fr",NN,"Mọi nghề nghiệp");
+ f("fv",["Hoàn cảnh khó khăn","Neo đơn","Không giấy tờ","Vi phạm pháp luật","Trẻ nghỉ học"],"Mọi diện",["kk","nd","kg","vp","nghi"])}
+function render(){
+ const q=norm($("q").value).split(/\s+/).filter(Boolean),a=$("fa").value,c=$("fc").value,r=$("fr").value,v=$("fv").value;
+ const R=P.filter(p=>q.every(t=>p._s.includes(t))&&(!F||F.f(p))&&(!FL.dc||norm(p.dc).startsWith(FL.dc))&&(!FL.cu||norm(p.cu).startsWith(FL.cu))&&(!FL.nn||norm(nn(p)).startsWith(FL.nn))&&(!FL.ds||dsTags(p).some(t=>t.startsWith(FL.ds))));
+ $("cnt").textContent=(F?"Lọc: "+F.n+" ✕ chạm để bỏ · ":"")+(P.length?`${R.length} / ${P.length} nhân khẩu`+(R.length>80?" (hiện 80 đầu)":""):"Chưa có dữ liệu. Bấm ☰ → Nhập file Excel.");
+ $("list").innerHTML=`<div class="tw"><table><tr><th>Họ tên / Ngày sinh</th><th>Chủ hộ / Quan hệ</th><th>Cư trú</th><th>Nghề nghiệp</th><th>Diện</th></tr>`+R.slice(0,80).map(p=>`<tr data-id="${p.id}"><td><b>${esc(p.ten)}</b><br><small>${esc(p.ns||"?")}</small></td><td>${esc(p.chu)}<br><small>${esc(qh(p))}</small></td><td>${p.cu?CUI[CU4.indexOf(p.cu)]:"—"}</td><td>${esc(nn(p))||"—"}</td><td>${dsL(p).map(x=>`<span class="tag w">${x}</span>`).join("")}${p.hoc==="Nghỉ học"?'<span class="tag w">Nghỉ học</span>':""}</td></tr>`).join("")+"</table></div>"}
+$("list").onclick=e=>{const d=e.target.closest("tr[data-id]");if(d)detail(+d.dataset.id)};
+const st=document.createElement("style");st.textContent=".tw{overflow-x:auto;padding:0 12px}table{border-collapse:collapse;width:100%;font-size:14px;background:var(--card)}th{font-size:12px;color:var(--mu);text-align:left;padding:6px;position:sticky;top:0}td{padding:8px 6px;border-top:1px solid var(--ln);vertical-align:top}tr[data-id]{cursor:pointer}.ck{display:flex;gap:8px;align-items:center;color:var(--tx);font-size:15px}.ck input{width:auto}.bx{border:1px solid var(--ln);border-radius:10px;padding:8px 10px;margin:6px 0;background:var(--card)}.hs{font-size:13px;border-bottom:1px solid var(--ln);padding:6px 0}";document.head.appendChild(st);
+function detailEdit(id){
+ const p=P.find(x=>x.id===id);if(!p)return;const d=p.ds||{},nv=p.nv||{},pl=p.pl||{},g=p.dsg||{};
+ const hh=P.filter(x=>hkey(x)===hkey(p)).sort((a,b)=>a.stt-b.stt),ag=age(p.ns),kid=ag!=null&&ag>=6&&ag<=17;
+ const I=(i,v,t,x)=>`<input id="${i}" type="${t||"text"}" value="${esc(v||"")}" ${x||""}>`;
+ sheet(`<div class="row" style="justify-content:space-between"><h2>${esc(p.ten)}</h2><button class="g" onclick="detail(${id})">Hủy</button></div>
+ <div class="kv"><span>Ngày sinh</span><span>${esc(p.ns||"?")}</span><span>Giới tính</span><span>${esc(gt(p)||"—")}</span><span>Chủ hộ</span><span>${esc(p.chu)}</span><span>Địa chỉ thường trú</span><span>${esc(p.dc)}</span></div>
+ <label>Quan hệ với chủ hộ (dữ liệu gốc: ${esc(p.vaitro)})</label>${sel("e_qh",QH,qh(p)==="Chủ hộ"||QH.includes(p.qh)?p.qh||p.vaitro:p.qh)}<div id="e_qhk" style="display:none">${I("x_qhk",p.qhk,0,'placeholder="Quan hệ cụ thể"')}</div>
+ 
+ <label>Số điện thoại</label>${I("x_sdt",p.sdt,"tel")}<label>Tình trạng cư trú</label>${sel("e_cu",CU4,p.cu)}
+ <div id="g_dc" style="display:none"><label>Địa chỉ nơi ở hiện tại</label>${I("x_dc",p.dcht)}</div><div id="g_cg" style="display:none"><label>Ghi chú (vắng mặt từ năm nào, lần về gần nhất, đã bán nhà đất…)</label><textarea id="x_cg">${esc(p.cg)}</textarea></div>
+ <label>Nghề nghiệp</label>${sel("e_nn",NN,p.nn)}<div id="e_nnk" style="display:none">${I("x_nnk",p.nnk,0,'placeholder="Nghề nghiệp cụ thể"')}</div>
+ ${kid?`<label>Học tập (6–17 tuổi)</label>${sel("e_hc",HOC,p.hoc)}`:""}
+ <h3 class="s">Diện đặc biệt</h3>
+ ${DS3.map(([k,l])=>`<div class="bx"><label class="ck"><input type="checkbox" id="d_${k}" ${d[k]?"checked":""} onchange="tog()">${l}</label><div id="n_${k}" style="display:none">${I("x_"+k,g[k],0,'placeholder="Ghi chú"')}</div></div>`).join("")}
+ <div class="bx"><label class="ck"><input type="checkbox" id="d_vp" ${d.vp?"checked":""} onchange="tog()">Vi phạm pháp luật</label><div id="g_vp" style="display:none">
+  <label>A. Nghiệp vụ</label><label class="ck"><input type="checkbox" id="n_tt" ${nv.tt?"checked":""} onchange="tog()">Tù tha về</label><div id="d_tt" class="bx" style="display:none"><label>Ngày bắt</label>${I("t_bat",(nv.ttd||{}).bat,"date")}<label>Bản án</label>${I("t_ban",(nv.ttd||{}).ban)}<label>Tội danh</label>${I("t_toi",(nv.ttd||{}).toi)}<label>Ngày chấp hành xong án phạt tù</label>${I("t_xong",(nv.ttd||{}).xong,"date")}<label>Thời gian thử thách</label>${I("t_thu",(nv.ttd||{}).thu,0,'placeholder="VD: 24 tháng"')}</div><label class="ck"><input type="checkbox" id="n_ta" ${nv.ta?"checked":""} onchange="tog()">Tiền án, tiền sự</label><div id="d_ta" class="bx" style="display:none"><label>Chi tiết hành vi vi phạm pháp luật</label><textarea id="x_hv">${esc((nv.tad||{}).hv)}</textarea><label>Bản án / hình thức xử lý</label>${I("a_xl",(nv.tad||{}).xl)}<label>Ngày xử lý</label>${I("a_ngay",(nv.tad||{}).ngay,"date")}</div><label class="ck"><input type="checkbox" id="n_kh" ${nv.kh?"checked":""} onchange="tog()">Khác</label><div id="e_nvk" style="display:none"><textarea id="x_nvk">${esc(nv.khT)}</textarea></div>
+  <label>B. Pháp luật</label>${PL.map(([k,l])=>{const x=pl[k]||{};return`<div class="bx"><label class="ck"><input type="checkbox" id="p_${k}" ${x.on?"checked":""} onchange="tog()">${l} ${x.hh?'<span class="tag w">Đã hết thời hạn</span>':""}</label><div id="pl_${k}" style="display:none"><label>Ngày bắt đầu quản lý</label>${I("b_"+k,x.bd,"date",`oninput="calc('${k}')"`)}<label>Thời hạn (tháng)</label>${I("h_"+k,x.han,"number",`oninput="calc('${k}')"`)}<label>Ngày kết thúc quản lý</label>${I("k_"+k,x.kt,"date")}<label>Ghi chú</label>${I("pg_"+k,x.ghi)}</div></div>`}).join("")}
+ </div></div>
+ <div class="row" style="margin-top:12px"><button id="sv">Lưu</button><span class="msg" id="sm"></span></div>
+ <h3 class="s">Lịch sử cập nhật</h3>${(p.ls||[]).slice().reverse().map(h=>`<div class="hs"><b>${new Date(h.t).toLocaleString("vi-VN")}</b> · ${esc(h.n)}<br><small>Cũ: ${esc(h.a)}<br>Mới: ${esc(h.b)}</small></div>`).join("")||'<small style="color:var(--mu)">Chưa có thay đổi.</small>'}
+ <h3 class="s">Cả hộ (${hh.length} người)</h3>${hh.map(x=>`<div class="mem" onclick="detail(${x.id})"><span>${esc(x.ten)}${x.id===id?" ◀":""}</span><small>${esc(qh(x))} · ${esc(x.ns||"?")}</small></div>`).join("")}`);
+ $("e_qhk").firstChild&&0;
+ $("sv").onclick=async()=>{const V=i=>$(i).value.trim(),C=i=>$(i).checked,b=snap(p);
+  p.qh=V("e_qh");{const s0=p.sdt;p.sdt=V("x_sdt");if(p.sdt!==s0)p.sdtSua=true}p.qhk=V("x_qhk");p.cu=V("e_cu");p.dcht=V("x_dc");p.cg=V("x_cg");p.nn=V("e_nn");p.nnk=V("x_nnk");if($("e_hc"))p.hoc=V("e_hc");
+  p.ds={vp:C("d_vp")};p.dsg={};DS3.forEach(([k])=>{p.ds[k]=C("d_"+k);p.dsg[k]=V("x_"+k)});
+  p.nv={tt:C("n_tt"),ta:C("n_ta"),kh:C("n_kh"),khT:V("x_nvk"),ttd:{bat:V("t_bat"),ban:V("t_ban"),toi:V("t_toi"),xong:V("t_xong"),thu:V("t_thu")},tad:{hv:V("x_hv"),xl:V("a_xl"),ngay:V("a_ngay")}};
+  const o=p.pl||{};p.pl={};PL.forEach(([k])=>{const x=o[k]||{},kt=V("k_"+k);p.pl[k]={on:C("p_"+k),bd:V("b_"+k),han:V("h_"+k),kt,ghi:V("pg_"+k),hh:!!x.hh&&x.kt===kt}});
+  expire(p);idx2(p);const a=snap(p);for(const k in a)if(a[k]!==b[k])log(p,k,b[k]||"—",a[k]||"—");
+  p.upd=new Date().toISOString();const rec={...p};delete rec._s;
+  try{await tx("p","readwrite",s=>s.put(rec));$("sm").textContent="Đã lưu";render();detail(id)}catch(e){$("sm").textContent="Lỗi lưu: "+e.message}};
+ $("e_cu").onchange=$("e_qh").onchange=$("e_nn").onchange=tog;tog()}
+function tog(){const v=i=>$(i)?$(i).value:"",c=CU4.indexOf(v("e_cu"));
+ show("g_dc",c===1||c===2);show("g_cg",c===2||c===3);show("e_qhk",v("e_qh")==="Khác");show("e_nnk",v("e_nn")==="Khác");
+ DS3.forEach(([k])=>show("n_"+k,$("d_"+k).checked));show("g_vp",$("d_vp").checked);show("e_nvk",$("n_kh").checked);show("d_tt",$("n_tt").checked);show("d_ta",$("n_ta").checked);PL.forEach(([k])=>show("pl_"+k,$("p_"+k).checked))}
+function calc(k){const t=addM($("b_"+k).value,$("h_"+k).value);if(t)$("k_"+k).value=t}
+function dashboard(){
+ const n=P.length,hs=new Set(P.map(hkey)).size,ag=(a,b)=>p=>{const x=age(p.ns);return x!=null&&x>=a&&x<=b};FN=[];
+ const Rr=(lab,c,fn,base,cl)=>{const i=FN.push({n:lab,f:fn})-1;return`<div class="br" data-i="${i}"><div><span>${esc(lab)}</span><b>${c}${base?" · "+Math.round(c*100/base)+"%":""}</b></div><i class="${cl||""}" style="width:${base?Math.max(c*100/base,c?2:0):0}%"></i></div>`};
+ const R=(l,fn,base,cl)=>Rr(l,P.filter(fn).length,fn,base,cl),H=(l,k)=>{const f=p=>(p.ds||{})[k];return Rr(l,new Set(P.filter(f).map(hkey)).size,f,0,"w")};
+ const S=(t,h)=>`<h3 class="s">${t}</h3>${h}`,kid=ag(6,17),nk=P.filter(kid).length,dirty=P.filter(p=>p.upd&&p.upd>LB).length;
+ let h=`<div class="row" style="justify-content:space-between"><h2>Tổng quan</h2><button class="g" onclick="close()">Xem danh sách</button></div><div class="cards"><div class="cd"><b>${hs}</b><small>Số hộ</small></div><div class="cd"><b>${n}</b><small>Số khẩu</small></div></div>
+ <div class="msg" style="margin-top:8px">${dirty?dirty+" bản ghi chưa sao lưu":"Đã sao lưu"} · Lần cuối: ${LB?new Date(LB).toLocaleString("vi-VN"):"chưa lần nào"}</div>`;
+ const COL=["#2f7fd1","#e07b39","#3aa17e","#a25fc7","#8b95a1","#d1495b"];
+ const DN=(t,it)=>{const rs=it.map(([l,fn],i)=>({l,c:P.filter(fn).length,col:COL[i%COL.length],i:FN.push({n:l,f:fn})-1})),tot=rs.reduce((a,r)=>a+r.c,0)||1;let ac=0;
+  const g=rs.map(r=>{const a=ac/tot*100;ac+=r.c;return r.col+" "+a+"% "+ac/tot*100+"%"}).join(",");
+  return S(t,`<div class="dn"><div class="pie" style="background:conic-gradient(${g})"><span>${tot}</span></div><div class="lg">${rs.map(r=>`<div class="br" data-i="${r.i}"><span class="dt" style="background:${r.col}"></span>${esc(r.l)}<b>${r.c} · ${Math.round(r.c*100/tot)}%</b></div>`).join("")}</div></div>`)};
+ h+=DN("Giới tính",[["Nam",p=>gt(p)==="Nam"],["Nữ",p=>gt(p)==="Nữ"],["Chưa xác định",p=>!gt(p)]]);
+ h+=DN("Độ tuổi",[["Dưới 18 tuổi",ag(0,17)],["18 đến dưới 35",ag(18,34)],["35 đến dưới 60",ag(35,59)],["Từ 60 tuổi trở lên",ag(60,200)],["Chưa rõ năm sinh",p=>age(p.ns)==null]]);
+ h+=DN("Tình trạng cư trú",CU4.map((c,i)=>[CUI[i]+" "+c,p=>p.cu===c]).concat([["Chưa cập nhật",p=>!p.cu]]));
+ h+=S("Diện đặc biệt",R(`Trẻ 6–17 tuổi đã nghỉ học (trong ${nk} em)`,p=>kid(p)&&p.hoc==="Nghỉ học",nk,"w")+H("Hộ hoàn cảnh khó khăn","kk")+H("Hộ neo đơn","nd")+R("Nhân khẩu không giấy tờ tùy thân",p=>(p.ds||{}).kg,n,"w")+R("Nhân khẩu có thông tin vi phạm",p=>(p.ds||{}).vp,n,"w")+PL.map(([k,l])=>R(l+" (đang quản lý)",p=>((p.pl||{})[k]||{}).on&&!p.pl[k].hh,n)).join(""));
+ sheet(h+`<p style="color:var(--mu);font-size:13px">Chạm một dòng để lọc danh sách. “Hộ” đếm theo hộ có ít nhất một người thuộc diện.</p>`)}
+async function save(name,data){try{const d=await claude.use("downloads");if(!d)return mm("Không hỗ trợ lưu file.");await d.save({filename:name,data});
+ if(name.endsWith(".json")){LB=new Date().toISOString();await mset("lb",LB)}mm("Đã gửi yêu cầu lưu file.");syncUI()}catch(e){mm(e&&e.code==="declined"?"Bạn đã hủy.":"Không lưu được: "+(e.message||e))}}
+function syncUI(){const e=$("sst");if(e)e.textContent=`${P.filter(p=>p.upd&&p.upd>LB).length} bản ghi thay đổi chưa sao lưu · Lần sao lưu cuối: ${LB?new Date(LB).toLocaleString("vi-VN"):"chưa lần nào"}`}
+$("sy").onclick=()=>{sheet(`<div class="row" style="justify-content:space-between"><h2>Sao lưu và đồng bộ</h2><button class="g" onclick="close()">Đóng</button></div><p id="sst" style="font-weight:600"></p>
+ <p style="color:var(--mu);font-size:14px">Chưa cấu hình nguồn dữ liệu online nên bản này sao lưu ra file. Giữ file ở nơi an toàn (Zalo “Cloud của tôi”, thẻ nhớ, máy tính cơ quan…). Khôi phục: ☰ → Khôi phục.</p>
+ <button id="bk">💾 Sao lưu ngay (file JSON)</button><p><button class="g" id="csv">📤 Xuất danh sách ra Excel (CSV)</button></p><div class="msg" id="mm"></div>`);syncUI()};
+document.addEventListener("click",e=>{if(e.target.id!=="csv")return;const q=s=>'"'+String(s||"").replace(/"/g,'""')+'"';
+ const rows=[["Họ tên","Ngày sinh","Giới tính","SĐT","Địa chỉ","Chủ hộ","Quan hệ","Cư trú","Nơi ở hiện tại","Nghề nghiệp","Diện đặc biệt"]].concat(P.map(p=>[p.ten,p.ns,gt(p),p.sdt,p.dc,p.chu,qh(p),p.cu,p.dcht,nn(p),snap(p)["Diện đặc biệt"]]));
+ save("nhan-khau-"+today()+".csv","\ufeff"+rows.map(r=>r.map(q).join(",")).join("\r\n"))});
+const st2=document.createElement("style");st2.textContent=".dn{display:flex;gap:14px;align-items:center;margin-top:8px}.pie{width:120px;height:120px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;position:relative}.pie::after{content:'';position:absolute;inset:28px;border-radius:50%;background:var(--bg)}.pie span{position:relative;z-index:1;font-weight:700;font-size:18px}.lg{flex:1;min-width:0}.lg .br{display:flex;align-items:center;gap:6px;font-size:13px;margin:7px 0}.lg .br b{margin-left:auto;white-space:nowrap}.dt{width:10px;height:10px;border-radius:50%;flex:none}";document.head.appendChild(st2);
+/* ===== Thay thế nguồn dữ liệu: sao lưu → chọn file mới → xóa cũ → nhập mới ===== */
+let NF=null;const rpb=h=>{const e=$("rpb");if(e)e.innerHTML=h};
+const _m=$("menu").onclick;
+$("menu").onclick=()=>{_m();$("sh").insertAdjacentHTML("beforeend",`<hr style="border:0;border-top:1px solid var(--ln);margin:16px 0"><button class="d" id="rp">🔄 Thay thế nguồn dữ liệu</button><input id="fx2" type="file" accept=".xlsx,.xls,.csv" hidden><div id="rpb" style="margin-top:8px"></div>`)};
+const rpStart=()=>rpb(P.length?`<p style="font-size:14px">App sẽ <b>sao lưu</b> dữ liệu hiện tại ra file JSON, rồi cho bạn chọn file Excel mới, sau đó <b>xóa dữ liệu cũ</b> và nhập file mới. Chỉ xóa sau khi bạn xác nhận ở bước cuối.</p><button id="rp1">1. Sao lưu rồi tiếp tục</button> <button class="g" id="rpx">Hủy</button>`:`<p style="font-size:14px">Máy đang trống, chọn file nguồn để nhập.</p><button id="rp2">Chọn file nguồn</button>`);
+document.addEventListener("click",async e=>{const id=e.target.id;
+ if(id==="rp")rpStart();
+ else if(id==="rpx"){NF=null;rpb("")}
+ else if(id==="rp2")$("fx2").click();
+ else if(id==="rp1"){try{const d=await claude.use("downloads");if(!d)return mm("Không hỗ trợ lưu file, chưa xóa gì.");
+   await d.save({filename:"nhan-khau-truoc-khi-thay-"+today()+".json",data:JSON.stringify(P.map(p=>{const c={...p};delete c._s;return c}))});
+   LB=new Date().toISOString();await mset("lb",LB);rpb(`<p style="font-size:14px">✅ Đã gửi yêu cầu sao lưu. Hãy chắc file đã lưu được rồi mới tiếp tục.</p><button id="rp2">2. Chọn file nguồn mới</button> <button class="g" id="rpx">Hủy</button>`)}
+  catch(er){mm(er&&er.code==="declined"?"Bạn đã hủy, chưa xóa gì.":"Sao lưu lỗi, chưa xóa gì: "+(er.message||er))}}
+ else if(id==="rp3"&&NF){const f=NF;NF=null;try{await tx("p","readwrite",s=>s.clear());P=[];await importX(f);rpb("")}catch(er){mm("Lỗi: "+er.message)}}});
+document.addEventListener("change",async e=>{if(e.target.id!=="fx2")return;const f=e.target.files[0];e.target.value="";if(!f)return;
+ try{if(typeof XLSX==="undefined")return mm("Chưa tải được thư viện Excel (cần mạng).");
+  const wb=XLSX.read(await f.arrayBuffer(),{type:"array"}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:false,defval:""}),hd=(rows[0]||[]).map(norm);
+  if(!hd.some(h=>h.includes("ma ho")||h.includes("so hsct"))||!hd.some(h=>h.includes("ten thanh vien")||h.includes("ho ten")))return rpb(`<p class="msg">File này không có cột Mã hộ / Tên thành viên ở dòng đầu. Chưa xóa gì.</p>`);
+  NF=f;rpb(`<p style="font-size:14px">File mới: <b>${esc(f.name)}</b>, ${rows.length-1} dòng. Bấm bên dưới sẽ <b>xóa toàn bộ dữ liệu cũ</b> (kể cả lịch sử) và nhập file này.</p><button class="d" id="rp3">3. Xóa dữ liệu cũ và nhập file mới</button> <button class="g" id="rpx">Hủy</button>`)}catch(er){mm("Lỗi đọc file: "+er.message)}});
+/* ===== Bộ lọc gom một nút, lọc theo tiền tố ===== */
+let FL={dc:"",cu:"",nn:"",ds:""},FR={dc:"",cu:"",nn:"",ds:""};
+const FB='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 4h18l-7 8v6l-4 2v-8z"/></svg>';
+function dsTags(p){const d=p.ds||{},nv=p.nv||{},pl=p.pl||{},o=[];DS3.forEach(([k,l])=>{if(d[k])o.push(l)});
+ if(d.vp){o.push("Vi phạm pháp luật");if(nv.tt)o.push("Tù tha về");if(nv.ta)o.push("Tiền án, tiền sự");PL.forEach(([k,l])=>{if((pl[k]||{}).on)o.push(l)})}
+ if(p.hoc==="Nghỉ học")o.push("Trẻ nghỉ học");return o.map(norm)}
+function fbadge(){const n=Object.values(FL).filter(Boolean).length;$("fb").innerHTML=FB+(n?" <b>"+n+"</b>":"")}
+const DSO=[...DS3.map(x=>x[1]),"Vi phạm pháp luật","Tù tha về","Tiền án, tiền sự",...PL.map(x=>x[1]),"Trẻ nghỉ học"];
+function filterUI(){
+ const blk=(k,t,opts)=>`<div class="bx"><label style="margin-top:0"><b>${t}</b></label><div class="row"><input id="f_${k}" list="dl_${k}" value="${esc(FR[k])}" placeholder="Tất cả — hoặc gõ tiền tố…"><button class="g" onclick="$('f_${k}').value=''">Tất cả</button></div><datalist id="dl_${k}">${opts.map(o=>`<option value="${esc(o)}">`).join("")}</datalist></div>`;
+ sheet(`<div class="row" style="justify-content:space-between"><h2>Bộ lọc</h2><button class="g" onclick="close()">Đóng</button></div>`
+  +blk("dc","Địa chỉ",[...new Set(P.map(p=>p.dc))].sort((a,b)=>a.localeCompare(b,"vi",{numeric:true})))+blk("cu","Tình trạng cư trú",CU4)+blk("nn","Nghề nghiệp",NN)+blk("ds","Diện",DSO)
+  +`<div class="row" style="margin-top:12px"><button id="fok">Áp dụng</button><button class="g" id="fall">Bỏ tất cả bộ lọc</button></div><p style="color:var(--mu);font-size:13px">Tiền tố: gõ phần đầu, ví dụ “tổ 1” (không cần gõ dấu). Để trống = Tất cả.</p>`)}
+$("fb").onclick=filterUI;
+document.addEventListener("click",e=>{if(e.target.id!=="fok"&&e.target.id!=="fall")return;const all=e.target.id==="fall";
+ for(const k in FL){FR[k]=all?"":$("f_"+k).value.trim();FL[k]=norm(FR[k])}fbadge();close();render()});
+fbadge();
+/* ===== Tìm theo nhân khẩu / theo hộ; giới tính lấy từ nguồn ===== */
+const gn=s=>{const x=norm(s);return x.startsWith("nam")||x==="m"?"Nam":x.startsWith("nu")||x==="f"?"Nữ":""};
+let SM=1,HK=[];
+const st3=document.createElement("style");st3.textContent=".seg{flex:1;padding:8px}.seg.on{background:var(--ac);color:#fff;border-color:var(--ac)}";document.head.appendChild(st3);
+function seg(){$("m1").classList.toggle("on",SM===1);$("m2").classList.toggle("on",SM===2);$("q").placeholder=SM===1?"Tìm nhân khẩu: họ tên, SĐT, ngày sinh, địa chỉ…":"Tìm hộ: tên chủ hộ, địa chỉ, mã hộ, SĐT…"}
+$("m1").onclick=()=>{SM=1;seg();render()};$("m2").onclick=()=>{SM=2;seg();render()};
+function render(){
+ const q=norm($("q").value).split(/\s+/).filter(Boolean);
+ const QQ=parseQ($("q").value);const ok=p=>(!F||F.f(p))&&(!FL.dc||norm(p.dc).startsWith(FL.dc))&&(!FL.cu||norm(p.cu).startsWith(FL.cu))&&(!FL.nn||norm(nn(p)).startsWith(FL.nn))&&(!FL.ds||dsTags(p).some(t=>t.startsWith(FL.ds)));
+ const lab=F?"Lọc: "+F.n+" ✕ chạm để bỏ · ":"";
+ if(SM===1){
+  const R=P.filter(p=>nkMatch(p,QQ)&&ok(p)).sort((a,b)=>rank(a,QQ)-rank(b,QQ));
+  $("cnt").textContent=lab+(P.length?`${R.length} / ${P.length} nhân khẩu`+(R.length>80?" (hiện 80 đầu)":""):"Chưa có dữ liệu. Bấm ☰ → Nhập file Excel.");
+  $("list").innerHTML=`<div class="tw"><table><tr><th>Họ tên / Ngày sinh</th><th>Chủ hộ / Quan hệ</th><th>Địa chỉ</th></tr>`+R.slice(0,80).map(p=>`<tr data-id="${p.id}"><td><b>${esc(p.ten)}</b><br><small>${esc(p.ns||"?")}</small></td><td>${esc(p.chu)}<br><small>${esc(qh(p))}</small></td><td>${esc(p.dc)}</td></tr>`).join("")+"</table></div>";
+ }else{
+  const G=new Map();P.forEach(p=>{const k=hkey(p);let h=G.get(k);if(!h){h={m:[],ok:false};G.set(k,h)}h.m.push(p);if(ok(p))h.ok=true});
+  const H=[...G.values()].filter(h=>{h.s=norm([h.m[0].chu,h.m[0].ma,h.m[0].dc,...h.m.map(x=>x.sdt)].join(" "));return h.ok&&hoMatch(h,QQ)});
+  HK=H.slice(0,80);
+  $("cnt").textContent=lab+(P.length?`${H.length} / ${G.size} hộ`+(H.length>80?" (hiện 80 đầu)":""):"Chưa có dữ liệu. Bấm ☰ → Nhập file Excel.");
+  $("list").innerHTML=`<div class="tw"><table><tr><th>Chủ hộ / Địa chỉ</th><th>Khẩu</th><th>Diện trong hộ</th></tr>`+HK.map((h,i)=>{const t=[...new Set(h.m.flatMap(dsL))];if(h.m.some(x=>x.hoc==="Nghỉ học"))t.push("Nghỉ học");return`<tr data-h="${i}"><td><b>${esc(h.m[0].chu)}</b><br><small>${esc(h.m[0].dc)}</small></td><td>${h.m.length}</td><td>${t.map(x=>`<span class="tag w">${x}</span>`).join("")}</td></tr>`}).join("")+"</table></div>";
+ }}
+function hodetail(i){const h=HK[i];if(!h)return;const m=h.m.slice().sort((a,b)=>a.stt-b.stt);
+ sheet(`<div class="row" style="justify-content:space-between"><h2>Hộ ${esc(m[0].chu)}</h2><button class="g" onclick="close()">Đóng</button></div><div class="kv"><span>Địa chỉ</span><span>${esc(m[0].dc)}</span><span>Số khẩu</span><span>${m.length}</span></div>`+m.map(x=>`<div class="mem" onclick="detail(${x.id})"><span>${esc(x.ten)}<br><small>${esc(qh(x))} · ${esc(x.ns||"?")}</small></span><span>${dsL(x).map(t=>`<span class="tag w">${t}</span>`).join("")}</span></div>`).join(""))}
+$("list").onclick=e=>{const d=e.target.closest("tr[data-id]");if(d)return detail(+d.dataset.id);const h=e.target.closest("tr[data-h]");if(h)hodetail(+h.dataset.h)};
+seg();
+/* ===== Trang chi tiết dạng xem, nút Sửa mở form ===== */
+function dsView(p){const d=p.ds||{},nv=p.nv||{},pl=p.pl||{},g=p.dsg||{},o=[];
+ const kvl=a=>a.filter(x=>x[1]).map(x=>x[0]+": "+esc(x[1])).join("; "),sub=t=>`<div style="margin-left:10px">• ${t}</div>`;
+ DS3.forEach(([k,l])=>{if(d[k])o.push(`<div style="margin-bottom:6px"><b>${l}</b>${g[k]?": "+esc(g[k]):""}</div>`)});
+ if(d.vp){const a=[],b=[];
+  if(nv.tt){const t=nv.ttd||{},x=kvl([["Ngày bắt",t.bat&&fd(t.bat)],["Bản án",t.ban],["Tội danh",t.toi],["Chấp hành xong án phạt tù",t.xong&&fd(t.xong)],["Thời gian thử thách",t.thu]]);a.push("Tù tha về"+(x?"<br><small>"+x+"</small>":""))}
+  if(nv.ta){const t=nv.tad||{},x=kvl([["Hành vi vi phạm",t.hv],["Bản án / xử lý",t.xl],["Ngày xử lý",t.ngay&&fd(t.ngay)]]);a.push("Tiền án, tiền sự"+(x?"<br><small>"+x+"</small>":""))}
+  if(nv.kh)a.push("Khác"+(nv.khT?": "+esc(nv.khT):""));
+  PL.forEach(([k,l])=>{const x=pl[k];if(x&&x.on){const t=kvl([["Bắt đầu",x.bd&&fd(x.bd)],["Thời hạn",x.han&&x.han+" tháng"],["Kết thúc",x.kt&&fd(x.kt)],["Ghi chú",x.ghi]]);b.push(l+(x.hh?' <span class="tag w">Đã hết thời hạn</span>':"")+(t?"<br><small>"+t+"</small>":""))}});
+  o.push(`<div style="margin-bottom:6px"><b>Vi phạm pháp luật</b>${a.length?"<div>Nghiệp vụ:</div>"+a.map(sub).join(""):""}${b.length?"<div>Pháp luật:</div>"+b.map(sub).join(""):""}</div>`)}
+ return o.length?o.join(""):"Không"}
+function detail(id){
+ const p=P.find(x=>x.id===id);if(!p)return;
+ const hh=P.filter(x=>hkey(x)===hkey(p)).sort((a,b)=>a.stt-b.stt),ci=CU4.indexOf(p.cu),row=(k,v)=>`<span>${k}</span><span>${v}</span>`;
+ sheet(`<div class="row" style="justify-content:space-between"><h2>${esc(p.ten)}</h2><span class="row"><button id="ed">Sửa</button><button class="g" onclick="close()">Đóng</button></span></div>
+ <div class="kv">${row("Họ tên",esc(p.ten))+row("Ngày sinh",esc(p.ns||"?"))+row("Giới tính",esc(gt(p)||"—"))+row("Chủ hộ",esc(p.chu))+row("Quan hệ với chủ hộ",esc(qh(p))||"—")+row("Địa chỉ thường trú",esc(p.dc))+row("Số điện thoại",p.sdt?`<a class="call" href="tel:${esc(p.sdt)}">${esc(p.sdt)}</a>`:"—")+row("Tình trạng cư trú",p.cu?CUI[ci]+" "+esc(p.cu)+(p.dcht?"<br>Nơi ở hiện tại: "+esc(p.dcht):"")+(p.cg?"<br>Ghi chú: "+esc(p.cg):""):"Chưa cập nhật")+row("Nghề nghiệp",esc(nn(p))||"—")+(p.hoc?row("Học tập",esc(p.hoc)):"")+row("Diện đặc biệt",dsView(p))}</div>
+ <h3 class="s">Lịch sử cập nhật</h3>${(p.ls||[]).slice().reverse().map(h=>`<div class="hs"><b>${new Date(h.t).toLocaleString("vi-VN")}</b> · ${esc(h.n)}<br><small>Cũ: ${esc(h.a)}<br>Mới: ${esc(h.b)}</small></div>`).join("")||'<small style="color:var(--mu)">Chưa có thay đổi.</small>'}
+ <h3 class="s">Cả hộ (${hh.length} người)</h3>${hh.map(x=>`<div class="mem" onclick="detail(${x.id})"><span>${esc(x.ten)}${x.id===id?" ◀":""}</span><small>${esc(qh(x))} · ${esc(x.ns||"?")}</small></div>`).join("")}`);
+ $("ed").onclick=()=>detailEdit(id)}
+/* ===== Tìm kiếm chính xác: khớp theo cụm từ nguyên chữ, có dấu thì khớp đúng dấu ===== */
+const WC=new WeakMap();
+const wd=s=>String(s||"").normalize("NFC").toLowerCase().split(/[\s,.;:\/\-]+/).filter(Boolean);
+function parseQ(v){v=String(v||"").trim();return{raw:v,w:wd(v),num:/^[\d\s\/.\-]+$/.test(v),dg:v.replace(/\D/g,"")}}
+function phraseIn(qw,tw){if(!qw.length)return true;
+ for(let i=0;i+qw.length<=tw.length;i++){let ok=true;
+  for(let j=0;j<qw.length;j++){const a=qw[j],b=tw[i+j];if(!(a===norm(a)?norm(b)===a:b===a)){ok=false;break}}
+  if(ok)return true}return false}
+const cw=p=>WC.get(p)||(WC.set(p,{t:wd(p.ten),d:wd(p.dc)}),WC.get(p));
+function nkMatch(p,Q){if(!Q.raw)return true;
+ if(Q.num)return(Q.dg.length>=3&&String(p.sdt||"").replace(/\D/g,"").includes(Q.dg))||String(p.ns||"").includes(Q.raw);
+ const c=cw(p);return phraseIn(Q.w,c.t)||phraseIn(Q.w,c.d)||!!(p.dcht&&phraseIn(Q.w,wd(p.dcht)))}
+function hoMatch(h,Q){if(!Q.raw)return true;const m=h.m[0];
+ if(Q.num)return Q.dg.length>=3&&(String(m.ma||"").replace(/\D/g,"").includes(Q.dg)||h.m.some(x=>String(x.sdt||"").replace(/\D/g,"").includes(Q.dg)));
+ return phraseIn(Q.w,wd(m.chu))||phraseIn(Q.w,wd(m.dc))}
+function rank(p,Q){if(!Q.raw||Q.num)return 0;const t=cw(p).t;
+ if(t.length===Q.w.length&&Q.w.every((x,i)=>x===t[i]))return 0;
+ return t.slice(0,Q.w.length).every((x,i)=>x===Q.w[i])?1:2}
+initLock();
+</script>
+
+
+
+
+
+</body>
+</html>
